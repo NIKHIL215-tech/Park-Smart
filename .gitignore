@@ -11,3 +11,11 @@ backend/out/
 desktop.ini
 .DS_Store
 Thumbs.db
+
+# AI/tool metadata
+.claude/
+.qodo/
+.codex/
+.cursor/
+.windsurf/
+.github/copilot-instructions.md
