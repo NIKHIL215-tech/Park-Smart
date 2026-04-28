@@ -1,0 +1,10 @@
+Download mysql-connector-j-9.x.x.jar from:
+  https://dev.mysql.com/downloads/connector/j/
+
+Select:
+  Platform: Platform Independent
+  Download: mysql-connector-j-x.x.x.zip
+
+Extract the .jar file and place it in THIS folder (backend/lib/).
+
+Then run compile.bat

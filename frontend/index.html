@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkSmart – Intelligent Parking Space Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">
+    <div class="logo-icon">🅿</div>
+    ParkSmart
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" onclick="showPage('booking')" id="navBook">Book Slot</button>
+    <button class="nav-btn" onclick="showPage('history')" id="navHistory">My Bookings</button>
+    <button class="nav-btn" onclick="showPage('admin')">Admin</button>
+    <button class="nav-btn" onclick="showPage('login')" id="navLogin">Login</button>
+  </div>
+  <div class="nav-right">
+    <span class="user-badge" id="userBadge">👤 User</span>
+    <button class="btn-logout" id="btnLogout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">SRM Institute — DBMS Mini Project</div>
+    <h1>Intelligent <span>Parking</span><br>Space Management</h1>
+    <p>Real-time slot allocation, automated billing and seamless vehicle management — all in one system.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showPage('booking')">Book a Slot →</button>
+      <button class="btn-outline" onclick="showPage('admin')">Admin Dashboard</button>
+    </div>
+  </div>
+  <div class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card teal">
+        <div class="stat-icon">🟢</div>
+        <div class="stat-value" id="homeAvail">--</div>
+        <div class="stat-label">Available Slots</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-value" id="homeOccupied">--</div>
+        <div class="stat-label">Occupied Slots</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">📋</div>
+        <div class="stat-value" id="homeActive">--</div>
+        <div class="stat-label">Active Bookings</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value" id="homeRevenue">--</div>
+        <div class="stat-label">Total Revenue (₹)</div>
+      </div>
+    </div>
+    <div class="section-title">Live Parking Map <span class="pill" id="totalSlotPill">0 slots</span></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot av"></div> Available</div>
+      <div class="legend-item"><div class="legend-dot oc"></div> Occupied</div>
+    </div>
+    <div class="slots-grid" id="homeSlotsGrid"></div>
+  </div>
+</div>
+
+<!-- LOGIN / REGISTER PAGE -->
+<div id="login" class="page">
+  <div id="loginBox" class="form-section" style="margin-top:3rem;">
+    <h2>Welcome back</h2>
+    <p>Sign in to manage your bookings</p>
+    <div class="msg" id="loginMsg"></div>
+    <div class="form-row"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+    <div class="form-row"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+    <button class="form-submit" onclick="loginUser()">Sign In</button>
+    <div class="form-footer">No account? <a onclick="toggleAuth()">Register here</a></div>
+  </div>
+  <div id="registerBox" class="form-section" style="margin-top:3rem; display:none;">
+    <h2>Create Account</h2>
+    <p>Register to book parking slots</p>
+    <div class="msg" id="registerMsg"></div>
+    <div class="form-row"><label>Full Name</label><input type="text" id="regName" placeholder="Nikhil Singh"></div>
+    <div class="form-row"><label>Email</label><input type="email" id="regEmail" placeholder="nikhil@gmail.com"></div>
+    <div class="form-row"><label>Phone</label><input type="text" id="regPhone" placeholder="9876543210"></div>
+    <div class="form-row"><label>Password</label><input type="password" id="regPassword" placeholder="Create a password"></div>
+    <button class="form-submit" onclick="registerUser()">Create Account</button>
+    <div class="form-footer">Have an account? <a onclick="toggleAuth()">Login here</a></div>
+  </div>
+</div>
+
+<!-- BOOKING PAGE -->
+<div id="booking" class="page">
+  <div class="booking-layout">
+    <div>
+      <div class="section-title">Select a Parking Slot</div>
+      <div class="floor-filter" id="floorFilter"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot av"></div> Available — click to select</div>
+        <div class="legend-item"><div class="legend-dot oc"></div> Occupied</div>
+        <div class="legend-item"><div class="legend-dot se"></div> Selected</div>
+      </div>
+      <div class="slots-grid" id="bookingSlotsGrid"></div>
+    </div>
+    <div>
+      <div class="booking-form-card">
+        <h2>Booking Details</h2>
+        <div class="selected-slot-info" id="selectedSlotInfo">Click an available slot to select it</div>
+        <div class="form-row"><label>Vehicle Number</label><input type="text" id="bookVehicle" placeholder="TN01AB1234"></div>
+        <div class="form-row">
+          <label>Vehicle Type</label>
+          <select id="bookType"><option value="Car">Car</option><option value="Bike">Bike</option></select>
+        </div>
+        <div class="form-row"><label>Your Name</label><input type="text" id="bookName" placeholder="Your full name"></div>
+        <div class="msg" id="bookMsg"></div>
+        <button class="form-submit" onclick="confirmBooking()">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MY BOOKINGS PAGE -->
+<div id="history" class="page">
+  <div class="history-section">
+    <div class="section-title">My Bookings</div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="admin" class="page">
+  <div class="admin-layout">
+    <div class="section-title">Admin Dashboard</div>
+    <div class="admin-grid">
+      <div class="admin-stat"><div class="big" style="color:var(--accent2)" id="adminUsers">--</div><div class="label">Total Users</div></div>
+      <div class="admin-stat"><div class="big" style="color:var(--accent)"  id="adminAvail">--</div><div class="label">Available Slots</div></div>
+      <div class="admin-stat"><div class="big" style="color:var(--warning)" id="adminActive">--</div><div class="label">Active Bookings</div></div>
+      <div class="admin-stat"><div class="big" style="color:var(--success)" id="adminRevenue">--</div><div class="label">Revenue (₹)</div></div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">All Bookings</div>
+      <table>
+        <thead><tr><th>ID</th><th>User</th><th>Vehicle</th><th>Slot</th><th>Entry Time</th><th>Exit Time</th><th>Fee</th><th>Status</th></tr></thead>
+        <tbody id="adminBookingsTable"></tbody>
+      </table>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+      <div class="table-card">
+        <div class="table-head">All Users</div>
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
+          <tbody id="adminUsersTable"></tbody>
+        </table>
+      </div>
+      <div class="table-card">
+        <div class="table-head">Parking Slots</div>
+        <table>
+          <thead><tr><th>Slot</th><th>Floor</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody id="adminSlotsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; margin-top:1rem; flex-wrap:wrap;">
+      <button class="btn-primary" onclick="openAddSlot()" style="background:var(--navy);">+ Add Slot</button>
+      <button class="btn-outline" onclick="loadAdmin()" style="color:var(--text); border-color:var(--border);">⟳ Refresh</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXIT PAYMENT MODAL -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <h2>💳 Process Exit Payment</h2>
+    <p>Confirming vehicle exit and releasing the parking slot.</p>
+    <div class="payment-summary" id="paymentSummary"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="processExit()">Confirm & Pay</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SLOT MODAL -->
+<div class="modal-overlay" id="addSlotModal">
+  <div class="modal">
+    <h2>Add Parking Slot</h2>
+    <p>Add a new parking slot to the system.</p>
+    <div class="form-row"><label>Floor Number</label><input type="number" id="newFloor" min="1" max="5" value="1"></div>
+    <div class="form-row">
+      <label>Slot Type</label>
+      <select id="newSlotType"><option value="Car">Car</option><option value="Bike">Bike</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddSlot()">Cancel</button>
+      <button class="btn-confirm" onclick="addSlot()">Add Slot</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

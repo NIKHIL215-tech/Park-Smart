@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParkSmart – Project Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a; --navy-light: #1a3c5e;
+    --accent: #00d4aa; --accent2: #4f8ef7; --accent3: #f7a84f;
+    --bg: #f0f4f8; --surface: #fff; --surface2: #f7fafc;
+    --text: #0d1b2a; --text2: #4a5568; --text3: #718096;
+    --border: #e2e8f0; --success: #38a169; --danger: #e53e3e;
+    --radius: 12px; --radius-lg: 20px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+
+  /* TOP BAR */
+  .topbar { background:var(--navy); color:#fff; padding:1rem 2rem; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .topbar .logo-icon { width:36px; height:36px; background:var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .topbar h1 { font-size:1.1rem; font-weight:700; }
+  .topbar p  { font-size:0.8rem; color:rgba(255,255,255,0.55); }
+  .badge { margin-left:auto; background:rgba(0,212,170,0.15); color:var(--accent); border:1px solid rgba(0,212,170,0.3); padding:0.3rem 0.9rem; border-radius:20px; font-size:0.75rem; font-weight:600; white-space:nowrap; }
+
+  /* LAYOUT */
+  .container { max-width:900px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+
+  /* SECTION */
+  .section { margin-bottom:3rem; }
+  .section-header {
+    display:flex; align-items:center; gap:0.75rem;
+    margin-bottom:1.5rem; padding-bottom:0.75rem;
+    border-bottom:2px solid var(--border);
+  }
+  .section-num { width:32px; height:32px; background:var(--navy); color:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0; }
+  .section-header h2 { font-size:1.3rem; font-weight:700; }
+  .section-header .tag { background:var(--surface2); border:1px solid var(--border); color:var(--text3); padding:0.2rem 0.7rem; border-radius:20px; font-size:0.72rem; font-weight:600; }
+
+
+  /* NOTE BOX */
+  .note {
+    background:#fffbeb; border:1.5px solid #f6e05e;
+    border-radius:var(--radius); padding:1rem 1.25rem; margin-bottom:1.25rem;
+    font-size:0.88rem; color:#744210;
+  }
+  .note strong { color:#5a3000; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background:var(--navy); border-radius:var(--radius);
+    overflow:hidden; margin-bottom:1.25rem;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .code-block .code-header {
+    background:rgba(255,255,255,0.06); padding:0.6rem 1rem;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .code-block .code-header span { font-size:0.75rem; color:rgba(255,255,255,0.5); font-family:'DM Mono',monospace; }
+  .code-block .code-header .file-tag { background:rgba(0,212,170,0.15); color:var(--accent); padding:0.15rem 0.6rem; border-radius:6px; font-size:0.7rem; font-weight:600; }
+  .code-block pre { padding:1.25rem; font-family:'DM Mono',monospace; font-size:0.82rem; color:#e2e8f0; overflow-x:auto; line-height:1.65; }
+  .hl  { color:#00d4aa; font-weight:600; }   /* teal highlight  */
+  .hl2 { color:#f7a84f; font-weight:600; }   /* orange highlight */
+  .hl3 { color:#a78bfa; }                     /* purple – keywords */
+  .hl4 { color:#fc8181; }                     /* red – strings */
+  .cm  { color:#4a6080; font-style:italic; }  /* comments */
+
+  /* FLOW DIAGRAM */
+  .flow { display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem; }
+  .flow-box {
+    background:var(--surface); border:1.5px solid var(--border);
+    border-radius:10px; padding:0.6rem 1rem; font-size:0.85rem; font-weight:600;
+    text-align:center; min-width:110px;
+  }
+  .flow-box.blue  { background:#ebf4ff; border-color:#bee3f8; color:#2b6cb0; }
+  .flow-box.green { background:#e6f7f4; border-color:#9fe1cb; color:#0f6e56; }
+  .flow-box.navy  { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .flow-box.orange{ background:#fffbeb; border-color:#f6e05e; color:#744210; }
+  .flow-arrow { font-size:1.1rem; color:var(--text3); }
+
+  /* STEPS */
+  .steps { list-style:none; }
+  .steps li { display:flex; gap:1rem; margin-bottom:1rem; align-items:flex-start; }
+  .step-num { width:26px; height:26px; background:var(--navy); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .step-body { font-size:0.92rem; color:var(--text2); }
+  .step-body strong { color:var(--text); }
+
+  /* DML TABLE */
+  .demo-table { width:100%; border-collapse:collapse; margin-bottom:1.25rem; font-size:0.87rem; }
+  .demo-table th { background:var(--navy); color:#fff; padding:0.65rem 1rem; text-align:left; font-weight:600; font-size:0.78rem; letter-spacing:0.4px; }
+  .demo-table td { padding:0.75rem 1rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  .demo-table tr:last-child td { border-bottom:none; }
+  .demo-table tr:nth-child(even) td { background:var(--surface2); }
+  .demo-table .sql { font-family:'DM Mono',monospace; font-size:0.8rem; color:#2b6cb0; background:#ebf4ff; padding:0.2rem 0.5rem; border-radius:5px; display:inline-block; }
+  .demo-table .effect { color:var(--text3); font-size:0.82rem; }
+
+  /* ARCH CARD */
+  .arch-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
+  .arch-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:1.25rem; }
+  .arch-card .arch-icon { font-size:1.75rem; margin-bottom:0.5rem; }
+  .arch-card h3 { font-size:0.95rem; font-weight:700; margin-bottom:0.5rem; }
+  .arch-card p  { font-size:0.82rem; color:var(--text3); line-height:1.6; }
+  .arch-card ul { font-size:0.82rem; color:var(--text3); padding-left:1.1rem; line-height:1.8; }
+  @media(max-width:640px){ .arch-grid{grid-template-columns:1fr;} .flow{flex-direction:column;} }
+
+  /* TOC */
+  .toc { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; margin-bottom:2.5rem; }
+  .toc h3 { font-size:0.85rem; font-weight:700; color:var(--text3); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px; }
+  .toc a  { display:block; font-size:0.9rem; color:var(--accent2); text-decoration:none; padding:0.2rem 0; font-weight:500; }
+  .toc a:hover { text-decoration:underline; }
+
+  hr.divider { border:none; border-top:1px solid var(--border); margin:2.5rem 0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-icon">🅿</div>
+  <div>
+    <h1>ParkSmart — Project Documentation & Technical Reference</h1>
+    <p>DBMS Mini Project · SRM Institute · Java + MySQL + HTML/CSS/JS</p>
+  </div>
+  <div class="badge">Localhost Demo Ready</div>
+</div>
+
+<div class="container">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>Contents</h3>
+    <a href="#s1">1 · Project Overview & Architecture</a>
+    <a href="#s2">2 · How JDBC Database Connectivity Works</a>
+    <a href="#s3">3 · File-by-File Code Explanation</a>
+    <a href="#s4">4 · Live DML Demo — Change DB, See it in App</a>
+    <a href="#s5">5 · DDL — How Tables Are Structured</a>
+    <a href="#s6">6 · API Routes Reference</a>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Project Overview &amp; Architecture</h2>
+      <span class="tag">3-Tier</span>
+    </div>
+
+    <p style="color:var(--text2);margin-bottom:1.5rem;">
+      This is a <strong>3-tier client-server application</strong>. Each tier is a separate folder with a clear responsibility.
+      The tiers never skip each other — the browser never touches MySQL directly.
+    </p>
+
+    <!-- FLOW -->
+    <div class="flow">
+      <div class="flow-box blue">🌐 Browser<br><small>frontend/</small></div>
+      <div class="flow-arrow">──HTTP fetch()──▶</div>
+      <div class="flow-box navy">☕ Java Server<br><small>port 8080</small></div>
+      <div class="flow-arrow">──JDBC──▶</div>
+      <div class="flow-box green">🗄 MySQL<br><small>parksmart DB</small></div>
+    </div>
+
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="arch-icon">🌐</div>
+        <h3>Tier 1 — Frontend</h3>
+        <p><code>frontend/</code></p>
+        <ul>
+          <li>index.html — structure</li>
+          <li>style.css — all styling</li>
+          <li>app.js — logic, fetch() calls</li>
+        </ul>
+        <p style="margin-top:0.5rem;">Runs in the <strong>browser</strong>. Never talks to MySQL. Only talks to the Java server via HTTP.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">☕</div>
+        <h3>Tier 2 — Backend</h3>
+        <p><code>backend/src/</code></p>
+        <ul>
+          <li>Main.java — HTTP server</li>
+          <li>DBConnection.java — JDBC</li>
+          <li>dao/ — SQL queries</li>
+          <li>handler/ — API routes</li>
+        </ul>
+        <p style="margin-top:0.5rem;">Runs on <strong>localhost:8080</strong>. Receives HTTP requests, runs SQL, returns JSON.</p>
+      </div>
+      <div class="arch-card">
+        <div class="arch-icon">🗄</div>
+        <h3>Tier 3 — Database</h3>
+        <p><code>database/schema.sql</code></p>
+        <ul>
+          <li>users</li>
+          <li>parking_slots</li>
+          <li>bookings</li>
+          <li>payments</li>
+        </ul>
+        <p style="margin-top:0.5rem;">MySQL running on <strong>localhost:3306</strong>. All data lives here permanently.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>How JDBC Database Connectivity Works</h2>
+      <span class="tag">Core Concept</span>
+    </div>
+
+    <p style="color:var(--text2);margin-bottom:1.5rem;">
+      <strong>JDBC (Java Database Connectivity)</strong> is a Java API that lets Java code talk to any relational database
+      using a standard set of classes and interfaces. You never write socket code — JDBC handles it.
+      You only need 3 things: a <em>driver JAR</em>, a <em>connection URL</em>, and <em>SQL statements</em>.
+    </p>
+
+    <!-- Step by step -->
+    <ul class="steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-body"><strong>Load the Driver</strong> — The MySQL JDBC driver (<code>mysql-connector-j-8.4.0.jar</code>)
+        is a JAR file that knows how to speak MySQL's binary wire protocol. You load it with <code>Class.forName()</code>.
+        This is a one-time step when the server starts.</div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-body"><strong>Get a Connection</strong> — <code>DriverManager.getConnection(URL, user, pass)</code>
+        opens a TCP socket to MySQL, authenticates, and returns a <code>Connection</code> object.
+        Every query needs one.</div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-body"><strong>Create a Statement</strong> — Use <code>PreparedStatement</code> for queries with
+        parameters (prevents SQL injection). Use <code>Statement</code> for static queries.</div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-body"><strong>Execute SQL</strong> — <code>executeQuery()</code> for SELECT (returns a
+        <code>ResultSet</code>). <code>executeUpdate()</code> for INSERT / UPDATE / DELETE (returns rows affected).</div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-body"><strong>Read the ResultSet</strong> — Loop with <code>rs.next()</code>,
+        read columns with <code>rs.getString("col")</code>, <code>rs.getInt("col")</code>, etc.</div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div class="step-body"><strong>Close Everything</strong> — Use try-with-resources
+        (<code>try (Connection conn = ...)</code>) so connections auto-close and don't leak.</div>
+      </li>
+    </ul>
+
+    <!-- DBConnection code -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>The JDBC connection — this is the bridge between Java and MySQL</span>
+        <span class="file-tag">DBConnection.java</span>
+      </div>
+      <pre><span class="hl3">public class</span> <span class="hl">DBConnection</span> {
+
+    <span class="cm">// JDBC URL format: jdbc:mysql://&lt;host&gt;:&lt;port&gt;/&lt;database&gt;</span>
+    <span class="hl3">private static final</span> String <span class="hl">DB_URL</span>  = <span class="hl4">"jdbc:mysql://localhost:3306/parksmart?serverTimezone=UTC"</span>;
+    <span class="hl3">private static final</span> String <span class="hl">DB_USER</span> = <span class="hl4">"root"</span>;
+    <span class="hl3">private static final</span> String <span class="hl">DB_PASS</span> = <span class="hl4">"cseBtech4202"</span>;
+
+    <span class="hl3">static</span> {
+        <span class="cm">// Step 1 — Load the MySQL JDBC driver into the JVM</span>
+        Class.forName(<span class="hl4">"com.mysql.cj.jdbc.Driver"</span>);
+    }
+
+    <span class="cm">// Step 2 — Open a fresh connection for every query</span>
+    <span class="hl3">public static</span> Connection <span class="hl">getConnection</span>() <span class="hl3">throws</span> SQLException {
+        <span class="hl3">return</span> DriverManager.<span class="hl2">getConnection</span>(DB_URL, DB_USER, DB_PASS);
+    }
+}</pre>
+    </div>
+
+    <!-- PreparedStatement code -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>A complete JDBC query cycle — login example</span>
+        <span class="file-tag">UserDAO.java</span>
+      </div>
+      <pre><span class="hl3">public</span> User <span class="hl">login</span>(String email, String password) <span class="hl3">throws</span> SQLException {
+
+    String sql = <span class="hl4">"SELECT id, name, email, phone FROM users WHERE email = ? AND password = ?"</span>;
+                    <span class="cm">// ^ the ? marks are placeholders — filled safely by PreparedStatement</span>
+
+    <span class="cm">// try-with-resources: conn, ps, rs all auto-close when the block ends</span>
+    <span class="hl3">try</span> (Connection      conn = DBConnection.<span class="hl2">getConnection</span>();   <span class="cm">// Step 2</span>
+         PreparedStatement ps   = conn.<span class="hl2">prepareStatement</span>(sql)) { <span class="cm">// Step 3</span>
+
+        ps.<span class="hl2">setString</span>(1, email);    <span class="cm">// bind 1st ?</span>
+        ps.<span class="hl2">setString</span>(2, password); <span class="cm">// bind 2nd ?</span>
+
+        <span class="hl3">try</span> (ResultSet rs = ps.<span class="hl2">executeQuery</span>()) {  <span class="cm">// Step 4 — run SELECT</span>
+            <span class="hl3">if</span> (rs.<span class="hl2">next</span>()) {                       <span class="cm">// Step 5 — read result</span>
+                User u  = <span class="hl3">new</span> User();
+                u.id    = rs.<span class="hl2">getInt</span>(<span class="hl4">"id"</span>);
+                u.name  = rs.<span class="hl2">getString</span>(<span class="hl4">"name"</span>);
+                u.email = rs.<span class="hl2">getString</span>(<span class="hl4">"email"</span>);
+                <span class="hl3">return</span> u;
+            }
+        }
+    }                              <span class="cm">// Step 6 — auto-closed here</span>
+    <span class="hl3">return null</span>;
+}</pre>
+    </div>
+
+    <!-- Transaction code -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>JDBC Transaction — processExit() does 3 UPDATEs atomically</span>
+        <span class="file-tag">BookingDAO.java</span>
+      </div>
+      <pre>Connection conn = DBConnection.<span class="hl2">getConnection</span>();
+conn.<span class="hl2">setAutoCommit</span>(<span class="hl3">false</span>);   <span class="cm">// start transaction — nothing writes until commit()</span>
+<span class="hl3">try</span> {
+    <span class="cm">// 1. Mark booking as Completed</span>
+    <span class="cm">// 2. Free the parking slot (SET status = 'Available')</span>
+    <span class="cm">// 3. Mark payment as Paid</span>
+
+    conn.<span class="hl2">commit</span>();   <span class="cm">// all 3 succeed → write to DB</span>
+} <span class="hl3">catch</span> (SQLException e) {
+    conn.<span class="hl2">rollback</span>(); <span class="cm">// any failure → undo everything</span>
+}</pre>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>File-by-File Code Explanation</h2>
+      <span class="tag">Architecture</span>
+    </div>
+
+    <!-- Main.java -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>Entry point — starts the HTTP server on port 8080</span>
+        <span class="file-tag">Main.java</span>
+      </div>
+      <pre>HttpServer server = HttpServer.<span class="hl2">create</span>(<span class="hl3">new</span> InetSocketAddress(<span class="hl">8080</span>), 0);
+server.<span class="hl2">createContext</span>(<span class="hl4">"/api/"</span>, <span class="hl3">new</span> ApiHandler());    <span class="cm">// all /api/* → Java logic</span>
+server.<span class="hl2">createContext</span>(<span class="hl4">"/"</span>,     <span class="hl3">new</span> StaticHandler()); <span class="cm">// everything else → serve HTML/CSS/JS files</span>
+server.<span class="hl2">start</span>();
+<span class="cm">// No external server (Tomcat/Spring) needed — Java has a built-in HTTP server</span></pre>
+    </div>
+
+    <!-- DAO pattern -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>DAO pattern — each table has its own class with all its SQL</span>
+        <span class="file-tag">dao/ folder</span>
+      </div>
+      <pre><span class="cm">// UserDAO.java    → SELECT/INSERT on users table</span>
+<span class="cm">// SlotDAO.java    → SELECT/INSERT/UPDATE on parking_slots table</span>
+<span class="cm">// BookingDAO.java → SELECT/INSERT/UPDATE on bookings table (+ JOIN query)</span>
+<span class="cm">// PaymentDAO.java → INSERT/UPDATE on payments table</span>
+
+<span class="cm">// Example from BookingDAO — one query that JOINs 4 tables:</span>
+String sql =
+    <span class="hl4">"SELECT b.id, b.user_id, u.name AS user_name, b.vehicle, "</span> +
+    <span class="hl4">"       b.slot_id, ps.floor AS slot_floor, b.status, p.status AS payment_status "</span> +
+    <span class="hl4">"FROM bookings b "</span> +
+    <span class="hl4">"LEFT JOIN users         u  ON b.user_id    = u.id  "</span> +
+    <span class="hl4">"LEFT JOIN parking_slots ps ON b.slot_id    = ps.id "</span> +
+    <span class="hl4">"LEFT JOIN payments      p  ON p.booking_id = b.id"</span>;
+<span class="cm">// Result → one row has all data the frontend needs, no multiple round trips</span></pre>
+    </div>
+
+    <!-- ApiHandler -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>Request router — maps HTTP method + path to the right DAO call</span>
+        <span class="file-tag">ApiHandler.java</span>
+      </div>
+      <pre><span class="cm">// Incoming:  GET /api/slots?floor=2</span>
+<span class="cm">// ↓ ApiHandler reads path + query string</span>
+<span class="cm">// ↓ calls slotDAO.getAllSlots(2)</span>
+<span class="cm">// ↓ converts List&lt;Slot&gt; to JSON string</span>
+<span class="cm">// ↓ writes response with Content-Type: application/json</span>
+
+<span class="cm">// Incoming:  POST /api/bookings  { vehicle:"TN01AB", slot_id:3, ... }</span>
+<span class="cm">// ↓ reads JSON body from request</span>
+<span class="cm">// ↓ calls slotDAO.getById(3) → check if Available</span>
+<span class="cm">// ↓ calls bookingDAO.createBooking(...)</span>
+<span class="cm">// ↓ calls paymentDAO.createPending(...)</span>
+<span class="cm">// ↓ calls slotDAO.updateStatus(3, "Occupied")</span>
+<span class="cm">// ↓ returns { "success":true, "booking_id":4 }</span></pre>
+    </div>
+
+    <!-- Frontend app.js -->
+    <div class="code-block">
+      <div class="code-header">
+        <span>Frontend talks to backend using fetch() — replaces the old in-memory DB object</span>
+        <span class="file-tag">frontend/app.js</span>
+      </div>
+      <pre><span class="cm">// OLD (single HTML file): data lived in a JS object in RAM</span>
+<span class="cm">// const DB = { users:[...], slots:[...], bookings:[...] }</span>
+
+<span class="cm">// NEW (3-tier): fetch() sends HTTP request to Java, which queries MySQL</span>
+<span class="hl3">async function</span> <span class="hl">loadHome</span>() {
+    <span class="cm">// Both requests fire in parallel (Promise.all)</span>
+    <span class="hl3">const</span> [stats, slots] = <span class="hl3">await</span> Promise.<span class="hl2">all</span>([
+        fetch(<span class="hl4">'/api/stats'</span>).then(r => r.json()),
+        fetch(<span class="hl4">'/api/slots'</span>).then(r => r.json())
+    ]);
+    <span class="cm">// stats = { avail:6, occupied:2, active:1, revenue:250 }  ← from MySQL</span>
+    <span class="cm">// slots = [{ id:1, floor:1, type:"Car", status:"Available"}, ...]</span>
+    document.getElementById(<span class="hl4">'homeAvail'</span>).textContent = stats.avail;
+    <span class="cm">// ... render slot cards from real DB data</span>
+}</pre>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Live DML Demo — Change the Database, Watch the App Update</h2>
+      <span class="tag">Demo Script</span>
+    </div>
+
+    <p style="color:var(--text2);margin-bottom:1.5rem;">
+      Run these SQL commands in <strong>MySQL Workbench</strong> (connected to <code>parksmart</code> database),
+      then refresh the browser to see the change instantly. No server restart needed.
+    </p>
+
+    <div class="note">
+      <strong>How to open MySQL Workbench:</strong> Open MySQL Workbench → Local instance → password: <code>cseBtech4202</code> → click on <code>parksmart</code> schema on the left → open a new query tab.
+    </div>
+
+    <table class="demo-table">
+      <thead>
+        <tr><th>What to Show</th><th>SQL Command</th><th>Where to See It in App</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Free an occupied slot</strong></td>
+          <td><span class="sql">UPDATE parking_slots SET status = 'Available' WHERE id = 3;</span></td>
+          <td class="effect">Home page → Live map shows slot S3 turns green. Available count increases by 1.</td>
+        </tr>
+        <tr>
+          <td><strong>Add a new slot</strong></td>
+          <td><span class="sql">INSERT INTO parking_slots (floor, type, status) VALUES (4, 'Car', 'Available');</span></td>
+          <td class="effect">Home page → new slot card S9 appears. Booking page → Floor 4 pill appears in filter.</td>
+        </tr>
+        <tr>
+          <td><strong>Add a new user</strong></td>
+          <td><span class="sql">INSERT INTO users (name, email, phone, password) VALUES ('Test User', 'test@gmail.com', '9000011111', 'test@123');</span></td>
+          <td class="effect">Admin page → Total Users count increases. Users table shows new row.</td>
+        </tr>
+        <tr>
+          <td><strong>Delete a booking</strong></td>
+          <td><span class="sql">DELETE FROM bookings WHERE id = 2;</span></td>
+          <td class="effect">Admin page → All Bookings table loses that row. Active Bookings count drops.</td>
+        </tr>
+        <tr>
+          <td><strong>Change a slot type</strong></td>
+          <td><span class="sql">UPDATE parking_slots SET type = 'Bike' WHERE id = 1;</span></td>
+          <td class="effect">Home map → slot S1 badge changes from Car to Bike. Booking page shows Bike.</td>
+        </tr>
+        <tr>
+          <td><strong>See all bookings with JOIN</strong></td>
+          <td><span class="sql">SELECT b.id, u.name, b.vehicle, ps.floor, b.status, p.status AS paid FROM bookings b JOIN users u ON b.user_id=u.id JOIN parking_slots ps ON b.slot_id=ps.id JOIN payments p ON p.booking_id=b.id;</span></td>
+          <td class="effect">This is exactly the JOIN query the Admin page uses. Run it to see the raw data behind the table.</td>
+        </tr>
+        <tr>
+          <td><strong>Manually mark a booking paid</strong></td>
+          <td><span class="sql">UPDATE payments SET status='Paid', amount=200 WHERE booking_id=2;</span><br><span class="sql">UPDATE bookings SET status='Completed', total_fee=200, exit_time=NOW() WHERE id=2;</span></td>
+          <td class="effect">My Bookings page → booking changes from Active to Completed. Revenue in stats increases.</td>
+        </tr>
+        <tr>
+          <td><strong>Check revenue total</strong></td>
+          <td><span class="sql">SELECT SUM(amount) AS total_revenue FROM payments WHERE status='Paid';</span></td>
+          <td class="effect">Should match the Revenue card on Home and Admin pages exactly.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="speak">
+      <p>"Sir, you can see here — when I run this UPDATE directly in MySQL Workbench and refresh the browser,
+      the UI shows the new data immediately. That's because every page load calls a fresh SQL query through
+      JDBC — there is no cache or hardcoded data in the frontend."</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>DDL — How the Tables Are Structured</h2>
+      <span class="tag">Schema</span>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span>Four tables with primary keys, foreign keys, ENUMs, and constraints</span>
+        <span class="file-tag">database/schema.sql</span>
+      </div>
+      <pre><span class="cm">-- Table 1: users (stores login accounts)</span>
+<span class="hl3">CREATE TABLE</span> users (
+    id       <span class="hl">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    name     <span class="hl2">VARCHAR(100)</span> NOT NULL,
+    email    <span class="hl2">VARCHAR(100)</span> NOT NULL <span class="hl">UNIQUE</span>,     <span class="cm">-- no duplicate emails</span>
+    phone    <span class="hl2">VARCHAR(15)</span>,
+    password <span class="hl2">VARCHAR(100)</span> NOT NULL
+);
+
+<span class="cm">-- Table 2: parking_slots (the physical parking spaces)</span>
+<span class="hl3">CREATE TABLE</span> parking_slots (
+    id     <span class="hl">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    floor  <span class="hl2">INT</span>                           NOT NULL,
+    type   <span class="hl">ENUM('Car','Bike')</span>            NOT NULL, <span class="cm">-- only these 2 values allowed</span>
+    status <span class="hl">ENUM('Available','Occupied')</span>   NOT NULL DEFAULT <span class="hl4">'Available'</span>
+);
+
+<span class="cm">-- Table 3: bookings (who parked where and when)</span>
+<span class="hl3">CREATE TABLE</span> bookings (
+    id           <span class="hl">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    user_id      INT,
+    vehicle      <span class="hl2">VARCHAR(20)</span>              NOT NULL,
+    vehicle_type <span class="hl">ENUM('Car','Bike')</span>        NOT NULL,
+    slot_id      INT,
+    entry_time   <span class="hl2">DATETIME</span>                 DEFAULT <span class="hl">CURRENT_TIMESTAMP</span>,
+    exit_time    <span class="hl2">DATETIME</span>                 NULL,       <span class="cm">-- NULL = still parked</span>
+    total_fee    <span class="hl2">DECIMAL(10,2)</span>            DEFAULT 0,
+    status       <span class="hl">ENUM('Active','Completed')</span> DEFAULT <span class="hl4">'Active'</span>,
+    <span class="hl">FOREIGN KEY</span> (user_id) <span class="hl">REFERENCES</span> users(id) <span class="hl">ON DELETE SET NULL</span>,
+    <span class="hl">FOREIGN KEY</span> (slot_id) <span class="hl">REFERENCES</span> parking_slots(id) <span class="hl">ON DELETE SET NULL</span>
+);
+
+<span class="cm">-- Table 4: payments (billing record for each booking)</span>
+<span class="hl3">CREATE TABLE</span> payments (
+    id           <span class="hl">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    booking_id   INT,
+    amount       <span class="hl2">DECIMAL(10,2)</span>          DEFAULT 0,
+    payment_date <span class="hl2">DATETIME</span>               DEFAULT <span class="hl">CURRENT_TIMESTAMP</span>,
+    status       <span class="hl">ENUM('Pending','Paid')</span>  DEFAULT <span class="hl4">'Pending'</span>,
+    <span class="hl">FOREIGN KEY</span> (booking_id) <span class="hl">REFERENCES</span> bookings(id) <span class="hl">ON DELETE CASCADE</span>
+);</pre>
+    </div>
+
+    <div class="speak">
+      <p>"Sir, I have used ENUM for fields like status and type to enforce data integrity at the database level —
+      MySQL will reject any value other than what's defined. Foreign keys ensure referential integrity —
+      a booking cannot reference a user or slot that doesn't exist."</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>API Routes Reference</h2>
+      <span class="tag">REST API</span>
+    </div>
+
+    <p style="color:var(--text2);margin-bottom:1.25rem;">
+      The Java server exposes these endpoints. The browser calls them using <code>fetch()</code>.
+      You can also test them directly in the browser address bar (GET routes) or with Postman.
+    </p>
+
+    <table class="demo-table">
+      <thead>
+        <tr><th>Method</th><th>URL</th><th>What It Does</th><th>SQL Used</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>GET</td><td><code>/api/stats</code></td><td>Dashboard counts + revenue</td><td>COUNT() + SUM() queries</td></tr>
+        <tr><td>GET</td><td><code>/api/slots</code></td><td>All parking slots</td><td>SELECT * FROM parking_slots</td></tr>
+        <tr><td>GET</td><td><code>/api/slots?floor=2</code></td><td>Slots on floor 2 only</td><td>SELECT * ... WHERE floor=2</td></tr>
+        <tr><td>POST</td><td><code>/api/slots</code></td><td>Add a new slot</td><td>INSERT INTO parking_slots</td></tr>
+        <tr><td>GET</td><td><code>/api/bookings</code></td><td>All bookings (admin view)</td><td>4-table JOIN query</td></tr>
+        <tr><td>GET</td><td><code>/api/bookings?user_id=1</code></td><td>Bookings for one user</td><td>JOIN ... WHERE user_id=1</td></tr>
+        <tr><td>POST</td><td><code>/api/bookings</code></td><td>Create a booking</td><td>INSERT + UPDATE (slot Occupied)</td></tr>
+        <tr><td>POST</td><td><code>/api/bookings/exit</code></td><td>Process exit + payment</td><td>Transaction: 3 UPDATEs</td></tr>
+        <tr><td>GET</td><td><code>/api/users</code></td><td>All users (admin)</td><td>SELECT id,name,email,phone FROM users</td></tr>
+        <tr><td>POST</td><td><code>/api/users/login</code></td><td>Authenticate user</td><td>SELECT ... WHERE email=? AND password=?</td></tr>
+        <tr><td>POST</td><td><code>/api/users/register</code></td><td>Create new account</td><td>INSERT INTO users</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</div><!-- /container -->
+</body>
+</html>

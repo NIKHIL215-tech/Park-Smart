@@ -1,0 +1,13 @@
+# Compiled Java output
+backend/out/
+*.class
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+desktop.ini
+.DS_Store
+Thumbs.db
