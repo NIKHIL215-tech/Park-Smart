@@ -1,34 +1,30 @@
 @echo off
 cd /d "%~dp0"
 echo =========================================
-echo   ParkSmart ^| Compile
+echo   ParkSmart ^| One-Click Start
 echo =========================================
 
-:: Check javac is on PATH
+:: Check javac / java on PATH
 where javac >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] javac not found. Install JDK and add it to PATH.
+    echo [ERROR] JDK not found. Install JDK 11+ and add it to PATH.
     pause & exit /b 1
 )
 
 :: Check lib/ and JAR
 if not exist "lib\" (
-    echo [ERROR] lib\ folder missing.
-    echo  Place mysql-connector-j-*.jar inside backend\lib\
+    echo [ERROR] lib\ folder missing — place mysql-connector-j-*.jar inside backend\lib\
     pause & exit /b 1
 )
 dir /b "lib\*.jar" >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] No .jar found in lib\
-    echo  Download MySQL Connector/J from https://dev.mysql.com/downloads/connector/j/
+    echo [ERROR] No .jar in lib\ — download MySQL Connector/J and put it in backend\lib\
     pause & exit /b 1
 )
 
-:: Create output dir
+:: Compile (always re-compile to pick up any changes)
 if not exist "out\" mkdir out
-
-:: Compile
-echo Compiling...
+echo Step 1/2  Compiling sources...
 javac -cp "lib\*" -d out ^
   src\com\parksmart\model\User.java ^
   src\com\parksmart\model\Slot.java ^
@@ -43,12 +39,16 @@ javac -cp "lib\*" -d out ^
 
 if errorlevel 1 (
     echo.
-    echo [FAILED] Fix the errors above and run compile.bat again.
+    echo [FAILED] Compilation errors — fix them and try again.
     pause & exit /b 1
 )
+echo [OK] Compiled.
+echo.
 
-echo.
-echo [OK] Compiled successfully.
-echo      Run start.bat (or run.bat) to launch the server.
-echo.
+:: Start server
+echo Step 2/2  Starting ParkSmart server...
+echo  URL  : http://localhost:8080
+echo  Stop : Ctrl+C
+echo =========================================
+java -cp "out;lib\*" com.parksmart.Main
 pause
