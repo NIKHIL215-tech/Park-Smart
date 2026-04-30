@@ -117,6 +117,23 @@
           <select id="bookType"><option value="Car">Car</option><option value="Bike">Bike</option></select>
         </div>
         <div class="form-row"><label>Your Name</label><input type="text" id="bookName" placeholder="Your full name"></div>
+
+        <div class="time-section-divider">Booking Time</div>
+
+        <div class="form-row">
+          <label>Entry Date &amp; Time</label>
+          <input type="datetime-local" id="bookEntryTime" oninput="onEntryTimeChange()">
+          <div class="field-hint" id="entryHint"></div>
+        </div>
+        <div class="form-row">
+          <label>Expected Exit Time <span class="optional-label">(optional)</span></label>
+          <input type="datetime-local" id="bookExitTime" oninput="onExitTimeChange()">
+        </div>
+        <div class="est-fee-bar" id="estFeeBar" style="display:none;">
+          <span>Estimated fee</span>
+          <strong id="estFeeVal">—</strong>
+        </div>
+
         <div class="msg" id="bookMsg"></div>
         <button class="form-submit" onclick="confirmBooking()">Confirm Booking</button>
       </div>

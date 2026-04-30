@@ -8,6 +8,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.*;
 
@@ -118,9 +119,26 @@ public class ApiHandler implements HttpHandler {
         int    slotId      = extractInt(body, "slot_id");
         int    userId      = extractInt(body, "user_id");
         String name        = extractString(body, "name");
+        String entryStr    = extractString(body, "entry_time"); // "YYYY-MM-DDTHH:MM"
 
         if (vehicle == null || vehicleType == null || slotId < 1) {
             send(ex, 400, err("vehicle, vehicle_type and slot_id are required")); return;
+        }
+
+        // Parse and validate entry time
+        Timestamp entryTime = null;
+        if (entryStr != null && !entryStr.isBlank()) {
+            try {
+                String normalized = entryStr.replace("T", " ");
+                if (normalized.length() == 16) normalized += ":00";
+                entryTime = Timestamp.valueOf(normalized);
+            } catch (IllegalArgumentException e) {
+                send(ex, 400, err("Invalid entry_time format. Use YYYY-MM-DDTHH:MM")); return;
+            }
+            long minAllowed = System.currentTimeMillis() + 55 * 60 * 1000; // 55-min buffer (allows for clock skew)
+            if (entryTime.getTime() < minAllowed) {
+                send(ex, 400, err("Entry time must be at least 1 hour from now")); return;
+            }
         }
 
         Slot slot = slotDAO.getById(slotId);
@@ -138,8 +156,8 @@ public class ApiHandler implements HttpHandler {
             userId = userDAO.register(guest);
         }
 
-        // Create booking
-        int bookingId = bookingDAO.createBooking(userId, vehicle, vehicleType, slotId);
+        // Create booking with the selected entry time
+        int bookingId = bookingDAO.createBooking(userId, vehicle, vehicleType, slotId, entryTime);
         if (bookingId < 0) { send(ex, 500, err("Failed to create booking")); return; }
 
         // Create pending payment

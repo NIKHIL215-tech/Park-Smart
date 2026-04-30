@@ -54,9 +54,9 @@ public class BookingDAO {
         }
     }
 
-    public int createBooking(int userId, String vehicle, String vehicleType, int slotId) throws SQLException {
+    public int createBooking(int userId, String vehicle, String vehicleType, int slotId, Timestamp entryTime) throws SQLException {
         String sql = "INSERT INTO bookings (user_id, vehicle, vehicle_type, slot_id, entry_time, status) " +
-                     "VALUES (?, ?, ?, ?, NOW(), 'Active')";
+                     "VALUES (?, ?, ?, ?, ?, 'Active')";
 
         try (Connection      conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -65,6 +65,7 @@ public class BookingDAO {
             ps.setString(2, vehicle);
             ps.setString(3, vehicleType);
             ps.setInt(4, slotId);
+            ps.setTimestamp(5, entryTime != null ? entryTime : new Timestamp(System.currentTimeMillis()));
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {

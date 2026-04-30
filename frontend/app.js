@@ -39,7 +39,7 @@ function showPage(id) {
   const btns = document.querySelectorAll('.nav-btn');
   if (idx !== undefined && btns[idx]) btns[idx].classList.add('active');
   if (id === 'home')    loadHome();
-  if (id === 'booking') loadBookingSlots();
+  if (id === 'booking') { loadBookingSlots(); initTimePickers(); }
   if (id === 'history') loadHistory();
   if (id === 'admin')   loadAdmin();
 }
@@ -123,21 +123,97 @@ function selectSlot(slot) {
   loadBookingSlots();
 }
 
-async function confirmBooking() {
-  const vehicle = document.getElementById('bookVehicle').value.trim().toUpperCase();
-  const type    = document.getElementById('bookType').value;
-  const name    = document.getElementById('bookName').value.trim();
-  const msg     = document.getElementById('bookMsg');
+// ── TIME PICKERS ──────────────────────────────────────────────────────────
+function localDateTimeString(date) {
+  // Returns "YYYY-MM-DDTHH:MM" in local time for datetime-local inputs
+  const pad = n => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
 
-  if (!vehicle || !name)  return showMsg(msg, 'error', 'Please fill all fields.');
-  if (!selectedSlot)      return showMsg(msg, 'error', 'Please select a parking slot first.');
+function initTimePickers() {
+  const minTime = new Date(Date.now() + 60 * 60 * 1000); // now + 1 hour
+  const minStr  = localDateTimeString(minTime);
+
+  const entryEl = document.getElementById('bookEntryTime');
+  const exitEl  = document.getElementById('bookExitTime');
+
+  entryEl.min   = minStr;
+  entryEl.value = minStr;
+
+  // Default exit = entry + 1 hour
+  const defExit = new Date(minTime.getTime() + 60 * 60 * 1000);
+  exitEl.min    = localDateTimeString(new Date(minTime.getTime() + 60 * 1000));
+  exitEl.value  = localDateTimeString(defExit);
+
+  updateEstFee();
+}
+
+function onEntryTimeChange() {
+  const entryEl = document.getElementById('bookEntryTime');
+  const exitEl  = document.getElementById('bookExitTime');
+  const hint    = document.getElementById('entryHint');
+  const entry   = new Date(entryEl.value);
+  const minTime = new Date(Date.now() + 60 * 60 * 1000);
+
+  if (!entryEl.value) { hint.textContent = ''; return; }
+
+  if (entry < minTime) {
+    hint.className   = 'field-hint error';
+    hint.textContent = 'Must be at least 1 hour from now.';
+  } else {
+    hint.className   = 'field-hint ok';
+    hint.textContent = 'Valid entry time.';
+  }
+
+  // Push exit min to at least 1 min after entry
+  exitEl.min = localDateTimeString(new Date(entry.getTime() + 60 * 1000));
+  if (exitEl.value && new Date(exitEl.value) <= entry) {
+    exitEl.value = localDateTimeString(new Date(entry.getTime() + 60 * 60 * 1000));
+  }
+  updateEstFee();
+}
+
+function onExitTimeChange() { updateEstFee(); }
+
+function updateEstFee() {
+  const entryVal = document.getElementById('bookEntryTime').value;
+  const exitVal  = document.getElementById('bookExitTime').value;
+  const bar      = document.getElementById('estFeeBar');
+  const feeEl    = document.getElementById('estFeeVal');
+
+  if (!entryVal || !exitVal) { bar.style.display = 'none'; return; }
+
+  const entry = new Date(entryVal);
+  const exit  = new Date(exitVal);
+  if (exit <= entry) { bar.style.display = 'none'; return; }
+
+  const hours = Math.max(1, Math.ceil((exit - entry) / 3_600_000));
+  feeEl.textContent  = `₹${hours * 50} (${hours} hr${hours > 1 ? 's' : ''} × ₹50)`;
+  bar.style.display  = 'flex';
+}
+
+async function confirmBooking() {
+  const vehicle    = document.getElementById('bookVehicle').value.trim().toUpperCase();
+  const type       = document.getElementById('bookType').value;
+  const name       = document.getElementById('bookName').value.trim();
+  const entryVal   = document.getElementById('bookEntryTime').value;
+  const msg        = document.getElementById('bookMsg');
+
+  if (!vehicle || !name) return showMsg(msg, 'error', 'Please fill all fields.');
+  if (!selectedSlot)     return showMsg(msg, 'error', 'Please select a parking slot first.');
+  if (!entryVal)         return showMsg(msg, 'error', 'Please select an entry date and time.');
+
+  const entry   = new Date(entryVal);
+  const minTime = new Date(Date.now() + 60 * 60 * 1000);
+  if (entry < minTime) return showMsg(msg, 'error', 'Entry time must be at least 1 hour from now.');
 
   const res = await post('/bookings', {
     vehicle,
     vehicle_type: type,
-    slot_id:  selectedSlot.id,
-    user_id:  currentUser ? currentUser.id : 0,
-    name
+    slot_id:      selectedSlot.id,
+    user_id:      currentUser ? currentUser.id : 0,
+    name,
+    entry_time:   entryVal   // "YYYY-MM-DDTHH:MM"
   });
 
   if (!res.success) return showMsg(msg, 'error', res.message);
@@ -148,6 +224,7 @@ async function confirmBooking() {
   document.getElementById('selectedSlotInfo').textContent = 'Click an available slot to select it';
   document.getElementById('bookVehicle').value = '';
   document.getElementById('bookName').value    = '';
+  initTimePickers();
   loadBookingSlots();
 }
 
